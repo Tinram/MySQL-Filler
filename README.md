@@ -1,7 +1,7 @@
 
 # MySQL Filler
 
-#### Populate a MySQL database and create pseudo foreign keys between tables.
+#### Populate a MySQL database and create fake foreign keys between tables.
 
 
 ## Purpose
@@ -11,7 +11,7 @@ Fill all the tables of a MySQL database with a limited number of rows, and jumbl
 
 ## Background
 
-As part of my work, I use empty database schemas which require population with junk data; real data is too copious and/or *verboten* (i.e. contains Personally Identifiable Information (PII)). My [old script](https://github.com/Tinram/Database-Filler) filled the database tables but I had to add a few foreign keys afterwards for joins.  Annoying.
+As part of my work, I use empty database schemas which require population with junk data; real data is too copious and/or *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) filled the database tables but I had to add a few foreign keys afterwards for joins.  Annoying.
 
 
 ## Requirements
@@ -39,12 +39,12 @@ php runner.php
 
 option | value | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description
 :- | :-: | :-: | :-
-`debug` | true or false | &nbsp; | toggle verbose output
-`num_rows` | integer | | number of rows to add to each database table
-`row_counter_threshold` | integer | | progress indicator, increase as number of rows considerably increases
-`FK_jumble` | true or false | | toggle foreign key jumbling to acquire valid joins on junk data
-`FK_percent_replacement`&nbsp;&nbsp;&nbsp;&nbsp; | integer | | percentage of foreign keys to replace
-`truncate` | true or false | |  toggle to wipe the database data conveniently, preserving the empty schema; also useful to reset primary key AUTO_INCREMENT row positions from an imported active schema
+*debug* | true or false | &nbsp; | toggle verbose output
+*num_rows* | integer | | number of rows to add to each database table
+*row_counter_threshold* | integer | | progress indicator, increase as number of rows considerably increases
+*FK_jumble* | true or false | | toggle foreign key jumbling to acquire valid joins on junk data
+*FK_percent_replacement* &nbsp;&nbsp;&nbsp;&nbsp; | integer | | percentage of foreign keys to replace
+*truncate* | true or false | |  toggle to wipe the database data conveniently, preserving the empty schema; also useful to reset primary key AUTO_INCREMENT row positions from an imported active schema
 
 
 ## Example Run
@@ -76,7 +76,7 @@ php runner.php
 
     Truncated all tables of 'world' database!
 
-Change `truncate` to true, execute runner.php again:
+Change `truncate` to true, execute *runner.php* again:
 
     Tables of 'world' populated with 20 rows.
 
@@ -103,7 +103,6 @@ Execute *runner.php*
 
 
 ```sql
-mysql> USE world;
 mysql> SELECT ID, CountryCode, country.Code FROM city INNER JOIN country ON country.Code = city.CountryCode;
 
 +----+-------------+------+
@@ -128,7 +127,7 @@ SELECT ID, CountryCode, country.Code FROM city INNER JOIN country ON country.Cod
 25 rows in set (0.00 sec)
 ```
 
-Meaningless data, but the foreign keys are starting to have relationships and SQL joins between tables are now realised. More rows can be added to increase the number of results.
+Meaningless data, but the foreign keys are starting to gain relationships, and so SQL joins between tables are now realised. More rows can be added to increase the number of results.
 
 
 ## Other Databases.
@@ -141,7 +140,7 @@ Meaningless data, but the foreign keys are starting to have relationships and SQ
 
 There is almost no optimisation. Speed never was on the agenda, and if it were, I would have chosen the wrong language.
 
-I load 100 to 1000 database rows and the key jumble facilitates SQL joins in the junk data.
+I load 100 to 1,000 database rows and the key jumble facilitates SQL joins in the junk data.
 
 For serious speed, there's Percona's Go-based [mysql_random_data_load](https://github.com/Percona-Lab/mysql_random_data_load). Currently this tool fills one table at a time &ndash; fast &ndash; yet laborious for databases with lots of tables, whereas I wanted all database tables populated with one command.
 
