@@ -11,7 +11,7 @@ Fill all the tables of a MySQL database with a limited number of rows, and jumbl
 
 ## Background
 
-As part of my work, I use empty database schemas which require population with junk data; real data is too copious and/or *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) filled the database tables but I had to add a few foreign keys afterwards for joins.  Annoying.
+Some work requires populating empty database schemas with junk data. Real data would be too copious and/or *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) filled the database tables but a few foreign keys needed to be added afterwards for joins &ndash; annoying.
 
 
 ## Requirements
@@ -39,17 +39,17 @@ php runner.php
 
 option | value | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description
 :- | :-: | :-: | :-
-*debug* | true or false | &nbsp; | toggle verbose output
+*debug* | true/false | &nbsp; | toggle verbose output
 *num_rows* | integer | | number of rows to add to each database table
 *row_counter_threshold* | integer | | progress indicator, increase as number of rows considerably increases
-*FK_jumble* | true or false | | toggle foreign key jumbling to acquire valid joins on junk data
-*FK_percent_replacement* &nbsp;&nbsp;&nbsp;&nbsp; | integer | | percentage of foreign keys to replace
-*truncate* | true or false | |  toggle to wipe the database data conveniently, preserving the empty schema; also useful to reset primary key AUTO_INCREMENT row positions from an imported active schema
+*FK_jumble* | true/false | | toggle foreign key jumbling to acquire valid joins on junk data
+*FK_percent_re<a href="https://www.lukasvileikis.com/the-basics-of-mysql-security/" target="_blank">https://www.lukasvileikis.com/the-basics-of-mysql-security/</a>placement* &nbsp;&nbsp;&nbsp;&nbsp; | integer | | percentage of foreign keys to replace
+*truncate* | true/false | |  toggle to wipe the database data conveniently, preserving the empty schema; also useful to reset primary key AUTO_INCREMENT row positions from an imported active schema
 
 
 ## Example Run
 
-Using the simple MySQL [world](https://dev.mysql.com/doc/index-other.html) database:
+Using the simple MySQL [*world*](https://dev.mysql.com/doc/index-other.html) database:
 
 ```bash
 $ tar -xzOf world-db.tar.gz | mysql -h localhost -u root -p
@@ -60,7 +60,7 @@ mysql> GRANT SELECT, INSERT, UPDATE, DROP ON world.* TO 'general'@'localhost' ID
 mysql> FLUSH PRIVILEGES;
 ```
 
-Wipe all data that the world database is shipped with:
+Wipe all data that *world* ships with:
 
 ```php
 $config = [
@@ -132,8 +132,8 @@ Meaningless data, but the foreign keys are starting to gain relationships, and s
 
 ## Other Databases.
 
-+ [basketball](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) has a substantial look-up (intersection) table.
-+ The famous [Sakila](https://dev.mysql.com/doc/index-other.html) database is just too complex with Geo data.
++ [*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) has a substantial look-up (intersection) table.
++ The famous [*Sakila*](https://dev.mysql.com/doc/index-other.html) database is just too complex with Geo data.
 
 
 ## Speed
@@ -142,13 +142,13 @@ There is almost no optimisation. Speed never was on the agenda, and if it were, 
 
 I load 100 to 1,000 database rows and the key jumble facilitates SQL joins in the junk data.
 
-For serious speed, there's Percona's Go-based [mysql_random_data_load](https://github.com/Percona-Lab/mysql_random_data_load). Currently this tool fills one table at a time &ndash; fast &ndash; yet laborious for databases with lots of tables, whereas I wanted all database tables populated with one command.
+For serious speed, there's Percona's Go-based [mysql_random_data_load](https://github.com/Percona-Lab/mysql_random_data_load). Currently, this tool fills one table at a time &ndash; fast &ndash; yet somewhat laboriously for databases with lots of tables, whereas I wanted all database tables populated with one command.
 
 
 ## MariaDB
 
 MariaDB has limited support.  
-Simple schemas such as [world](https://dev.mysql.com/doc/index-other.html) and [basketball](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) work fine in MariaDB.  
+Simple schemas such as [*world*](https://dev.mysql.com/doc/index-other.html) and [*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) work fine in MariaDB.  
 However, other schemas, ranging from simple to complex, which import and run seamlessly in MySQL versions 5.7 and 8.0, can really throw MariaDB.
 
 
@@ -156,7 +156,7 @@ However, other schemas, ranging from simple to complex, which import and run sea
 
 Tested using MySQL 5.7 and 8.0
 
-This package is definitely a beta. It's fit for my purpose (I have run it on dodgy and horrible medium-size schemas (with single-bit columns) and it performs well). But it may not be fit for your purpose.
+This package is definitely a beta. It's fit for my purpose (I have run it on horrible medium-size schemas (e.g. single-bit columns) and it performs well). But it may not be fit for your purpose.
 
 
 ## License
