@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.10
+        * @version         0.11
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -445,11 +445,12 @@ final class Filler
                         {
                             if ($v['data_type'] === 'decimal')
                             {
-                                    $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * 10), $v['precision']);
+                                $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * 10), $v['precision']);
                             }
                             else
                             {
-                                $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * (1000 - 1)), $v['precision']);
+                                $sType = 'd';
+                                $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * (1000 - 1)), 2);
                             }
                         }
                         else if ($v['data_type'] === 'date')
