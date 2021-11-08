@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.09
+        * @version         0.10
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -476,7 +476,7 @@ final class Filler
                         }
                         else if (strpos($v['data_type'], 'blob') !== false)
                         {
-                            $aDBCols[$sColumnName] = "b'blob";
+                            $aDBCols[$sColumnName] = 'BLOB 💩';
                         }
                         else if (strpos($v['data_type'], 'json') !== false)
                         {
