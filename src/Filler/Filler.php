@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.11
+        * @version         0.12
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -34,6 +34,9 @@ final class Filler
 
     /** @var integer $iCLIRowCounter, CLI usage: rows of SQL generated before displaying progress percentage */
     private $iCLIRowCounter = 1000;
+
+    /** @var array<string> $aIgnoreTables, names of problem tables to skip processing */
+    private $aIgnoreTables = [];
 
     /** @var array<array> $aFKs, foreign keys */
     private $aFKs = [];
@@ -89,7 +92,12 @@ final class Filler
             $this->iCLIRowCounter = (int) $aConfig['row_counter_threshold'];
         }
 
-        $q = '
+        if (isset($aConfig['ignore_tables']))
+        {
+            $this->aIgnoreTables = $aConfig['ignore_tables'];
+        }
+
+        $sTableQ = '
             SELECT
                 table_name
             FROM
@@ -99,7 +107,7 @@ final class Filler
             AND
                 TABLE_TYPE = "BASE TABLE"';
 
-        $rR = $this->db->conn->query($q);
+        $rR = $this->db->conn->query($sTableQ);
         $aT = $rR->fetch_all();
 
         $aTables = array_merge(...$aT);
@@ -189,6 +197,19 @@ final class Filler
                 if ($this->bDebug === true)
                 {
                     echo 'processing table ' . $sTable . ' ...' . PHP_EOL;
+                }
+
+                if (count($this->aIgnoreTables) !== 0)
+                {
+                    if (in_array($sTable, $this->aIgnoreTables))
+                    {
+                        if ($this->bDebug === true)
+                        {
+                            echo '** ignoring table ' . $sTable . ' **' . PHP_EOL;
+                        }
+
+                        continue;
+                    }
                 }
 
                 # get column attributes

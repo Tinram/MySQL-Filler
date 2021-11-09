@@ -38,12 +38,13 @@ php runner.php
 ## Options
 
 option | value | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description
-:- | :-: | :-: | :-
+:- | :- | :-: | :-
 *debug* | true/false | &nbsp; | toggle verbose output
 *num_rows* | integer | | number of rows to add to each database table
 *row_counter_threshold* | integer | | progress indicator, increase as number of rows considerably increases
 *FK_jumble* | true/false | | toggle foreign key jumbling to acquire valid joins on junk data
-*FK_percent_replacement* &nbsp;&nbsp;&nbsp;&nbsp; | integer | | percentage of foreign keys to replace
+*FK_percent_replacement* &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | integer | | percentage of foreign keys to replace
+*ignore_tables* | array | | names of problematic tables to skip processing
 *truncate* | true/false | |  toggle to wipe the database data conveniently, preserving the empty schema; also useful to reset primary key AUTO_INCREMENT row positions from an imported active schema
 
 
