@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.12
+        * @version         0.13
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -404,9 +404,9 @@ final class Filler
                             else if (isset($this->aFKs[$sColumnName]))
                             {
                                 $sLastFKValue = '
-                                    SELECT ' . $this->aFKs[$sColumnName]['column'] . '
-                                    FROM ' . $this->aFKs[$sColumnName]['table'] . '
-                                    ORDER BY ' . $this->aFKs[$sColumnName]['column'] . ' DESC
+                                    SELECT `' . $this->aFKs[$sColumnName]['column'] . '`
+                                    FROM `' . $this->aFKs[$sColumnName]['table'] . '`
+                                    ORDER BY `' . $this->aFKs[$sColumnName]['column'] . '` DESC
                                     LIMIT 1';
 
                                 $rR = $this->db->conn->query($sLastFKValue);
@@ -525,8 +525,8 @@ final class Filler
                 $aBindParams[0] = '';
 
                 $sInsert = '
-                    INSERT INTO ' . $sTable .
-                        '(' . join(',', $aColumnNames) . ')
+                    INSERT INTO `' . $sTable . '`
+                        (' . join(',', $aColumnNames) . ')
                     VALUES
                         (' . join(',', $aPlaceholders) . ')';
 
@@ -608,29 +608,36 @@ final class Filler
         $sChars = CharGenerator::generateText($iMaxLen, $sStyleType);
 
         $sUn = '
-            SELECT ' . $sColumnName . '
-            FROM ' . $sTable . '
-            WHERE ' . $sColumnName . ' = "' . $sChars . '"
+            SELECT `' . $sColumnName . '`
+            FROM `' . $sTable . '`
+            WHERE `' . $sColumnName . '` = "' . $sChars . '"
             LIMIT 1';
 
         $rR = $this->db->conn->query($sUn);
 
-        if ($rR->num_rows === 0)
+        if ($rR !== false)
         {
-            return $sChars;
-        }
-        else
-        {
-            $sT = $rR->fetch_row()[0];
-
-            if ($sChars === $sT)
-            {
-                goto dupe;
-            }
-            else
+            if ($rR->num_rows === 0)
             {
                 return $sChars;
             }
+            else
+            {
+                $sT = $rR->fetch_row()[0];
+
+                if ($sChars === $sT)
+                {
+                    goto dupe;
+                }
+                else
+                {
+                    return $sChars;
+                }
+            }
+        }
+        else
+        {
+            return 'ERROR';
         }
     }
 
@@ -684,8 +691,8 @@ final class Filler
             foreach ($aKey as $k)
             {
                 $sQ = '
-                    SELECT ' . $k['ref_table_key'] . '
-                    FROM ' . $k['ref_table'] . '
+                    SELECT `' . $k['ref_table_key'] . '`
+                    FROM `' . $k['ref_table'] . '`
                     ORDER BY RAND()
                     LIMIT ' . $iLimit;
 
@@ -710,8 +717,8 @@ final class Filler
                 foreach ($aK2 as $r)
                 {
                     $sUpdate = '
-                        UPDATE ' . $sTable  . '
-                        SET ' . $k['fk_column'] . ' = "' . $r . '"
+                        UPDATE `' . $sTable  . '`
+                        SET `' . $k['fk_column'] . '` = "' . $r . '"
                         ORDER BY RAND()
                         LIMIT ' . $iLimit;
                 }
