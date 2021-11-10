@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.19
+        * @version         0.20
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -389,142 +389,135 @@ final class Filler
                     {
                         $aDBCols[$sColumnName] = CharGenerator::generateDate(5, 'date', 'day');
                     }
-                    else
+                    else if (strpos($v['data_type'], 'int') !== false)
                     {
-                        # guesstimates from data types
-                        if ($v['data_type'] === 'char' || $v['data_type'] === 'varchar')
+                        $sType = 'i';
+
+                        if (isset($this->aFKs[$sColumnName])) # in FK array
                         {
-                            $sStyleType = ($v['max_length'] < 4) ? 'alpha_upper' : 'alpha';
+                            $sLastFKValue = '
+                                SELECT `' . $this->aFKs[$sColumnName]['column'] . '`
+                                FROM `' . $this->aFKs[$sColumnName]['table'] . '`
+                                ORDER BY `' . $this->aFKs[$sColumnName]['column'] . '` DESC
+                                LIMIT 1';
 
-                            if ($v['key'] === 'PRI') # character primaries
-                            {
-                                $aDBCols[$sColumnName] = $this->avoidDupes($sColumnName, $sTable, $v['max_length'], $sStyleType);
-                            }
-                            else if (isset($this->aFKs[$sColumnName]))
-                            {
-                                $sLastFKValue = '
-                                    SELECT `' . $this->aFKs[$sColumnName]['column'] . '`
-                                    FROM `' . $this->aFKs[$sColumnName]['table'] . '`
-                                    ORDER BY `' . $this->aFKs[$sColumnName]['column'] . '` DESC
-                                    LIMIT 1';
+                            $rR = $this->db->conn->query($sLastFKValue);
 
-                                $rR = $this->db->conn->query($sLastFKValue);
-
-                                if ($rR->num_rows === 0)
-                                {
-                                    $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], $sStyleType);
-                                }
-                                else
-                                {
-                                    $aDBCols[$sColumnName] = $this->avoidDupes($sColumnName, $sTable,$v['max_length'], $sStyleType);
-                                }
-                            }
-                            else if ($v['key'] === 'UNI')
+                            if ($rR->num_rows === 0)
                             {
-                                $aDBCols[$sColumnName] = $this->avoidDupes($sColumnName, $sTable, $v['max_length'], $sStyleType);
+                                $aDBCols[$sColumnName] = 1;
                             }
                             else
                             {
-                                $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], $sStyleType);
+                                $aR = $rR->fetch_row();
+                                $aDBCols[$sColumnName] = ((int) $aR[0]) + 1;
                             }
-                        }
-                        else if (strpos($v['data_type'], 'text') !== false)
-                        {
-                            $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], 'alpha');
-                        }
-                        else if (strpos($v['data_type'], 'int') !== false)
-                        {
-                            $sType = 'i';
-
-                            if (isset($this->aFKs[$sColumnName])) # in FK array
-                            {
-                                $sLastFKValue = '
-                                    SELECT `' . $this->aFKs[$sColumnName]['column'] . '`
-                                    FROM `' . $this->aFKs[$sColumnName]['table'] . '`
-                                    ORDER BY `' . $this->aFKs[$sColumnName]['column'] . '` DESC
-                                    LIMIT 1';
-
-                                $rR = $this->db->conn->query($sLastFKValue);
-
-                                if ($rR->num_rows === 0)
-                                {
-                                    $aDBCols[$sColumnName] = 1;
-                                }
-                                else
-                                {
-                                    $aR = $rR->fetch_row();
-                                    $aDBCols[$sColumnName] = ((int) $aR[0]) + 1;
-                                }
-                            }
-                            else
-                            {
-                                $aDBCols[$sColumnName] = (int) CharGenerator::generateNumber($v['max_length']);
-                            }
-                        }
-                        else if ($v['data_type'] === 'decimal' || $v['data_type'] === 'float' || $v['data_type'] === 'double')
-                        {
-                            if ($v['data_type'] === 'decimal')
-                            {
-                                $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * 10), $v['precision']);
-                            }
-                            else
-                            {
-                                $sType = 'd';
-                                $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * (1000 - 1)), 2);
-                            }
-                        }
-                        else if ($v['data_type'] === 'date')
-                        {
-                            $aDBCols[$sColumnName] = CharGenerator::generateDate(5, 'date', 'day');
-                        }
-                        else if ($v['data_type'] === 'datetime')
-                        {
-                            $aDBCols[$sColumnName] = CharGenerator::generateDate(11, 'date');
-                        }
-                        else if ($v['data_type'] === 'timestamp')
-                        {
-                            $aDBCols[$sColumnName] = CharGenerator::generateDate(11, 'date');
-                        }
-                        else if ($v['data_type'] === 'enum' || $v['data_type'] === 'set')
-                        {
-                            $k = array_rand($aEnumFields, 1);
-                            $aDBCols[$sColumnName] = $aEnumFields[$k];
-                        }
-                        else if ($v['data_type'] === 'year')
-                        {
-                            $aDBCols[$sColumnName] = CharGenerator::generateYear();
-                        }
-                        else if ($v['data_type'] === 'time')
-                        {
-                            $sTS = date('H:i:s', mt_rand(strtotime('yesterday'), time()));
-                            $aDBCols[$sColumnName] = $sTS;
-                        }
-                        else if (strpos($v['data_type'], 'blob') !== false)
-                        {
-                            $aDBCols[$sColumnName] = 'BLOB 💩';
-                        }
-                        else if (strpos($v['data_type'], 'varbinary') !== false)
-                        {
-                            $aDBCols[$sColumnName] = 'VARBINARY';
-                        }
-                        else if (strpos($v['data_type'], 'binary') !== false)
-                        {
-                            $aDBCols[$sColumnName] = 'BINARY';
-                        }
-                        else if (strpos($v['data_type'], 'json') !== false)
-                        {
-                            $aDBCols[$sColumnName] = json_encode(['json' => 'foobar']);
-                        }
-                        else if (strpos($v['data_type'], 'bit') !== false)
-                        {
-                            $sType = 'i';
-                            $iBitmask = bindec("b'1'"); # to incorporate BIT(1)
-                            $aDBCols[$sColumnName] = $iBitmask;
                         }
                         else
                         {
-                            $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], 'alpha');
+                            $aDBCols[$sColumnName] = (int) CharGenerator::generateNumber($v['max_length']);
                         }
+                    }
+                    else if ($v['data_type'] === 'char' || $v['data_type'] === 'varchar')
+                    {
+                        $sStyleType = ($v['max_length'] < 4) ? 'alpha_upper' : 'alpha';
+
+                        if ($v['key'] === 'PRI') # character primaries
+                        {
+                            $aDBCols[$sColumnName] = $this->avoidDupes($sColumnName, $sTable, $v['max_length'], $sStyleType);
+                        }
+                        else if (isset($this->aFKs[$sColumnName]))
+                        {
+                            $sLastFKValue = '
+                                SELECT `' . $this->aFKs[$sColumnName]['column'] . '`
+                                FROM `' . $this->aFKs[$sColumnName]['table'] . '`
+                                ORDER BY `' . $this->aFKs[$sColumnName]['column'] . '` DESC
+                                LIMIT 1';
+
+                            $rR = $this->db->conn->query($sLastFKValue);
+
+                            if ($rR->num_rows === 0)
+                            {
+                                $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], $sStyleType);
+                            }
+                            else
+                            {
+                                $aDBCols[$sColumnName] = $this->avoidDupes($sColumnName, $sTable,$v['max_length'], $sStyleType);
+                            }
+                        }
+                        else if ($v['key'] === 'UNI')
+                        {
+                            $aDBCols[$sColumnName] = $this->avoidDupes($sColumnName, $sTable, $v['max_length'], $sStyleType);
+                        }
+                        else
+                        {
+                            $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], $sStyleType);
+                        }
+                    }
+                    else if (strpos($v['data_type'], 'text') !== false)
+                    {
+                        $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], 'alpha');
+                    }
+                    else if ($v['data_type'] === 'decimal')
+                    {
+                         $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * 10), $v['precision']);
+                    }
+                    else if ($v['data_type'] === 'float' || $v['data_type'] === 'double')
+                    {
+                        $sType = 'd';
+                        $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * (1000 - 1)), 2);
+                    }
+                    else if ($v['data_type'] === 'date')
+                    {
+                        $aDBCols[$sColumnName] = CharGenerator::generateDate(5, 'date', 'day');
+                    }
+                    else if ($v['data_type'] === 'datetime')
+                    {
+                        $aDBCols[$sColumnName] = CharGenerator::generateDate(11, 'date');
+                    }
+                    else if ($v['data_type'] === 'timestamp')
+                    {
+                        $aDBCols[$sColumnName] = CharGenerator::generateDate(11, 'date');
+                    }
+                    else if ($v['data_type'] === 'time')
+                    {
+                        $sTS = date('H:i:s', mt_rand(strtotime('yesterday'), time()));
+                        $aDBCols[$sColumnName] = $sTS;
+                    }
+                    else if ($v['data_type'] === 'year')
+                    {
+                        $aDBCols[$sColumnName] = CharGenerator::generateYear();
+                    }
+                    else if ($v['data_type'] === 'enum' || $v['data_type'] === 'set')
+                    {
+                        $k = array_rand($aEnumFields, 1);
+                        $aDBCols[$sColumnName] = $aEnumFields[$k];
+                    }
+                    else if (strpos($v['data_type'], 'blob') !== false)
+                    {
+                        $aDBCols[$sColumnName] = 'BLOB 💩';
+                    }
+                    else if (strpos($v['data_type'], 'varbinary') !== false)
+                    {
+                        $aDBCols[$sColumnName] = 'VARBINARY';
+                    }
+                    else if (strpos($v['data_type'], 'binary') !== false)
+                    {
+                        $aDBCols[$sColumnName] = 'BINARY';
+                    }
+                    else if (strpos($v['data_type'], 'json') !== false)
+                    {
+                        $aDBCols[$sColumnName] = json_encode(['json' => 'foobar']);
+                    }
+                    else if (strpos($v['data_type'], 'bit') !== false)
+                    {
+                        $sType = 'i';
+                        $iBitmask = bindec("b'1'"); # to incorporate BIT(1)
+                        $aDBCols[$sColumnName] = $iBitmask;
+                    }
+                    else
+                    {
+                        $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], 'alpha');
                     }
 
                     $aColumnNames[] = '`' . $sColumnName . '`';
