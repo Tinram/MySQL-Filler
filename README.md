@@ -16,7 +16,7 @@ Some work requires populating empty database schemas with junk data. Real data w
 
 ## Requirements
 
-+ An empty or throwaway MySQL database.
++ An empty/truncated or throwaway MySQL database.
 + Sufficient privileges for the connecting user.
 
 
@@ -45,7 +45,7 @@ option | value | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description
 *FK_jumble* | true/false | | toggle foreign key jumbling to acquire valid joins on junk data
 *FK_percent_replacement* &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | integer | | percentage of foreign keys to replace
 *ignore_tables* | array | | names of problematic tables to skip processing
-*truncate* | true/false | |  toggle to wipe the database data conveniently, preserving the empty schema; also useful to reset primary key AUTO_INCREMENT row positions from an imported active schema
+*truncate* | true/false | | toggle to wipe the database data conveniently, preserving the empty schema; also useful to reset primary key AUTO_INCREMENT row positions from an imported active schema
 
 
 ## Example Run
@@ -131,10 +131,20 @@ SELECT ID, CountryCode, country.Code FROM city INNER JOIN country ON country.Cod
 Meaningless data, but the foreign keys are starting to gain relationships, and so SQL joins between tables are now realised. More rows can be added to increase the number of results.
 
 
-## Other Databases.
+## Example Databases
 
-+ [*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) has a substantial look-up (intersection) table.
-+ The famous [*Sakila*](https://dev.mysql.com/doc/index-other.html) database is just too complex with Geo data.
+database | support | notes |
+:- | :-: | :- |
+[*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) | :heavy_check_mark: | substantial intersection table |
+[employees](https://github.com/ronaldbradford/schema/blob/master/employees.sql) <small>(old)</small> | :heavy_check_mark: | |
+[Joomla](https://github.com/ronaldbradford/schema/blob/master/joomla.sql) <small>(old)</small> | :heavy_check_mark: | |
+[*Sakila*](https://dev.mysql.com/doc/index-other.html) | :heavy_multiplication_x: | |
+[*world*](https://dev.mysql.com/doc/index-other.html) | :heavy_check_mark: | |
+[WordPress](https://github.com/ronaldbradford/schema/blob/master/wordpress.sql) <small>(old)</small> | :heavy_check_mark: | |
+
+Sakila uses sophisticated datatypes such as Geo data.
+
+[Old schemas](https://github.com/ronaldbradford/schema) reference.
 
 
 ## Speed
@@ -157,7 +167,7 @@ However, other schemas, ranging from simple to complex, which import and run sea
 
 Tested using MySQL 5.7 and 8.0
 
-This package is definitely a beta. It's fit for my purpose (I have run it on horrible medium-size schemas (e.g. single-bit columns) and it performs well). But it may not be fit for your purpose.
+This package is a beta. It's fit for my purpose (I have run it on interesting proprietary schemas (e.g. with single-bit columns), as well as the example databases). But it cannot hope to support all MySQL schemas.
 
 
 ## License
