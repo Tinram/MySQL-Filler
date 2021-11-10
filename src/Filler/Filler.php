@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.16
+        * @version         0.17
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -377,10 +377,6 @@ final class Filler
                     {
                         $aDBCols[$sColumnName] = CharGenerator::generateDate(5, 'date', 'day');
                     }
-                    else if (strpos($sColumnName, 'timestamp') !== false)
-                    {
-                        $aDBCols[$sColumnName] = CharGenerator::generateDate(11, 'date');
-                    }
                     else
                     {
                         # guesstimates from data types
@@ -469,7 +465,11 @@ final class Filler
                         {
                             $aDBCols[$sColumnName] = CharGenerator::generateDate(5, 'date', 'day');
                         }
-                        else if ($v['data_type'] === 'datetime' || $v['data_type'] === 'timestamp')
+                        else if ($v['data_type'] === 'datetime')
+                        {
+                            $aDBCols[$sColumnName] = CharGenerator::generateDate(11, 'date');
+                        }
+                        else if ($v['data_type'] === 'timestamp')
                         {
                             $aDBCols[$sColumnName] = CharGenerator::generateDate(11, 'date');
                         }
