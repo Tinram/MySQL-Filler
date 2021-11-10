@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.20
+        * @version         0.21
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -256,17 +256,28 @@ final class Filler
                         break;
 
                         case 'tinytext':
-                        case 'varchar':
                         case 'char':
                             $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
                         break;
 
                         # limit large text datatype length
+                        case 'varchar':
+                            if (((int) $aRow['CHARACTER_MAXIMUM_LENGTH']) > 255)
+                            {
+                                $iMaxLen = 255;
+                            }
+                            else
+                            {
+                                $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
+                            }
+                        break;
+
                         case 'text':
                         case 'mediumtext':
                         case 'longtext':
                             $iMaxLen = 255;
                         break;
+                        ##
 
                         case 'date':
                         case 'datetime':
