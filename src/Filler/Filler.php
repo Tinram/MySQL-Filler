@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.17
+        * @version         0.18
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -274,6 +274,14 @@ final class Filler
                             $iMaxLen = 0;
                         break;
 
+                        case 'time':
+                            $iMaxLen = 10;
+                        break;
+
+                        case 'year':
+                            $iMaxLen = 4;
+                        break;
+
                         case 'float':
                         case 'decimal':
                         case 'double':
@@ -286,10 +294,6 @@ final class Filler
                             $aEnumFields = $aEnums[1];
                         break;
 
-                        case 'year':
-                            $iMaxLen = 4;
-                        break;
-
                         case 'tinyblob':
                         case 'blob':
                         case 'mediumblob':
@@ -297,8 +301,16 @@ final class Filler
                             $iMaxLen = 39;
                         break;
 
-                        case 'time':
-                            $iMaxLen = 10;
+                        case 'binary':
+                        case 'varbinary':
+                            if (((int) $aRow['CHARACTER_MAXIMUM_LENGTH']) < 39)
+                            {
+                                $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
+                            }
+                            else
+                            {
+                                $iMaxLen = 39;
+                            }
                         break;
 
                         case 'json':
@@ -310,7 +322,7 @@ final class Filler
                         break;
 
                         default:
-                            $this->bErrors ==true;
+                            $this->bErrors = true;
                             $this->aMessages[] = '*** UNSUPPORTED DATATYPE *** : ' . $aRow['DATA_TYPE'];
                             $iMaxLen = 0;
                     }
@@ -490,6 +502,14 @@ final class Filler
                         else if (strpos($v['data_type'], 'blob') !== false)
                         {
                             $aDBCols[$sColumnName] = 'BLOB 💩';
+                        }
+                        else if (strpos($v['data_type'], 'varbinary') !== false)
+                        {
+                            $aDBCols[$sColumnName] = 'VARBINARY';
+                        }
+                        else if (strpos($v['data_type'], 'binary') !== false)
+                        {
+                            $aDBCols[$sColumnName] = 'BINARY';
                         }
                         else if (strpos($v['data_type'], 'json') !== false)
                         {
