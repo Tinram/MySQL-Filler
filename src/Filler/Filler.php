@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.15
+        * @version         0.16
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -351,7 +351,14 @@ final class Filler
                     {
                         if ((strpos($sColumnName, 'first') !== false) || (strpos($sColumnName, 'last') !== false) || (strpos($sColumnName, 'user') !== false)) # avoid style_name etc
                         {
-                            $aDBCols[$sColumnName] = CharGenerator::generateName(15, 'gibberish');
+                            if ($v['max_length'] > 14)
+                            {
+                                $aDBCols[$sColumnName] = CharGenerator::generateName(14, 'gibberish');
+                            }
+                            else
+                            {
+                                $aDBCols[$sColumnName] = CharGenerator::generateName($v['max_length'], 'gibberish');
+                            }
                         }
                         else
                         {
