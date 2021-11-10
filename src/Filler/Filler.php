@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.14
+        * @version         0.15
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -346,22 +346,6 @@ final class Filler
 
                     $sType = 's'; # default parameter type
 
-                    # Sakila DB testing
-                    if ($v['key'] === 'PRI' && strpos($v['data_type'], 'int') !== false)
-                    {
-                        # fudge around loop counter not incrementing sufficiently
-                        switch ($v['data_type'])
-                        {
-                            case 'tinyint': $m = ($v['sign'] === '+') ? 127 : 255; break;
-                            case 'smallint' : $m = ($v['sign'] === '+') ? 32767 : 65535; break;
-                            case 'mediumint' : $m = ($v['sign'] === '+') ? 8388607 : 16777215; break;
-                            default: $m = ($v['sign'] === '+') ? 2147483647 : 4294967295;
-                        }
-
-                        $sType = 'i';
-                        $aDBCols[$sColumnName] = (int) mt_rand(1, $m);
-                    }
-
                     # act on column name hints first
                     if (strpos($sColumnName, 'name') !== false)
                     {
@@ -440,9 +424,9 @@ final class Filler
                             if (isset($this->aFKs[$sColumnName])) # in FK array
                             {
                                 $sLastFKValue = '
-                                    SELECT ' . $this->aFKs[$sColumnName]['column'] . '
-                                    FROM ' . $this->aFKs[$sColumnName]['table'] . '
-                                    ORDER BY ' . $this->aFKs[$sColumnName]['column'] . ' DESC
+                                    SELECT `' . $this->aFKs[$sColumnName]['column'] . '`
+                                    FROM `' . $this->aFKs[$sColumnName]['table'] . '`
+                                    ORDER BY `' . $this->aFKs[$sColumnName]['column'] . '` DESC
                                     LIMIT 1';
 
                                 $rR = $this->db->conn->query($sLastFKValue);
@@ -454,12 +438,12 @@ final class Filler
                                 else
                                 {
                                     $aR = $rR->fetch_row();
-                                    $aDBCols[$sColumnName] = ((int) $aR[0]);
+                                    $aDBCols[$sColumnName] = ((int) $aR[0]) + 1;
                                 }
                             }
                             else
                             {
-                                $aDBCols[$sColumnName] = CharGenerator::generateNumber($v['max_length']);
+                                $aDBCols[$sColumnName] = (int) CharGenerator::generateNumber($v['max_length']);
                             }
                         }
                         else if ($v['data_type'] === 'decimal' || $v['data_type'] === 'float' || $v['data_type'] === 'double')
