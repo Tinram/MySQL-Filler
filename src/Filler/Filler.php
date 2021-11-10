@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.18
+        * @version         0.19
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -359,7 +359,7 @@ final class Filler
                     $sType = 's'; # default parameter type
 
                     # act on column name hints first
-                    if (strpos($sColumnName, 'name') !== false)
+                    if (strpos($sColumnName, 'name') !== false && strpos($v['data_type'], 'int') === false)
                     {
                         if ((strpos($sColumnName, 'first') !== false) || (strpos($sColumnName, 'last') !== false) || (strpos($sColumnName, 'user') !== false)) # avoid style_name etc
                         {
@@ -377,7 +377,7 @@ final class Filler
                             $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], 'alpha');
                         }
                     }
-                    else if (strpos($sColumnName, 'email') !== false)
+                    else if (strpos($sColumnName, 'email') !== false && strpos($v['data_type'], 'int') === false)
                     {
                         $aDBCols[$sColumnName] = CharGenerator::generateEmail(10, 'gibberish');
                     }
