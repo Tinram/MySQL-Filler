@@ -14,17 +14,33 @@ Fill all the tables of a MySQL database with a limited number of rows, and jumbl
 Some work requires populating empty database schemas with junk data. Real data would be too copious and/or *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) filled the database tables but a few foreign keys needed to be added afterwards for joins &ndash; annoying.
 
 
+## Example Databases
+
+database | support | notes |
+:- | :-: | :- |
+[*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) | :heavy_check_mark: | substantial intersection table |
+[employees](https://github.com/ronaldbradford/schema/blob/master/employees.sql) <small>(old)</small> | :heavy_check_mark: | |
+[Joomla](https://github.com/ronaldbradford/schema/blob/master/joomla.sql) <small>(old)</small> | :heavy_check_mark: | |
+[*Sakila*](https://dev.mysql.com/doc/index-other.html) | :heavy_multiplication_x: | |
+[*world*](https://dev.mysql.com/doc/index-other.html) | :heavy_check_mark: | |
+[WordPress](https://github.com/ronaldbradford/schema/blob/master/wordpress.sql) <small>(old)</small> | :heavy_check_mark: | |
+
+Sakila uses sophisticated datatypes such as Geo data.
+
+[Old schemas](https://github.com/ronaldbradford/schema) reference.
+
+
 ## Requirements
 
-+ An empty/truncated or throwaway MySQL database.
-+ Sufficient privileges for the connecting user.
++ An empty/truncated or throwaway database already present in the MySQL server.
++ Sufficient privileges granted for the connecting user.
 
 
 ## Usage
 
 Import a database schema-only file into MySQL or use an existing 'throwaway' database already active within MySQL.
 
-**Do not use this package on a database that you care about: MySQL Filler will surely trash it.**
+**Do not use this package on a database that you care about: MySQL Filler will so surely trash it.**
 
 Ensure `SELECT, INSERT, UPDATE, DROP` privileges for the connecting user (`DROP` is required for table wiping.)
 
@@ -44,7 +60,7 @@ option | value | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description
 *row_counter_threshold* | integer | | progress indicator, increase as number of rows considerably increases
 *FK_jumble* | true/false | | toggle foreign key jumbling to acquire valid joins on junk data
 *FK_percent_replacement* &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | integer | | percentage of foreign keys to replace
-*ignore_tables* | array | | names of problematic tables to skip processing
+*ignore_tables* | array | | names of problematic/crazy-schema tables to skip processing
 *truncate* | true/false | | toggle to wipe the database data conveniently, preserving the empty schema; also useful to reset primary key AUTO_INCREMENT row positions from an imported active schema
 
 
@@ -131,22 +147,6 @@ SELECT ID, CountryCode, country.Code FROM city INNER JOIN country ON country.Cod
 Meaningless data, but the foreign keys are starting to gain relationships, and so SQL joins between tables are now realised. More rows can be added to increase the number of results.
 
 
-## Example Databases
-
-database | support | notes |
-:- | :-: | :- |
-[*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) | :heavy_check_mark: | substantial intersection table |
-[employees](https://github.com/ronaldbradford/schema/blob/master/employees.sql) <small>(old)</small> | :heavy_check_mark: | |
-[Joomla](https://github.com/ronaldbradford/schema/blob/master/joomla.sql) <small>(old)</small> | :heavy_check_mark: | |
-[*Sakila*](https://dev.mysql.com/doc/index-other.html) | :heavy_multiplication_x: | |
-[*world*](https://dev.mysql.com/doc/index-other.html) | :heavy_check_mark: | |
-[WordPress](https://github.com/ronaldbradford/schema/blob/master/wordpress.sql) <small>(old)</small> | :heavy_check_mark: | |
-
-Sakila uses sophisticated datatypes such as Geo data.
-
-[Old schemas](https://github.com/ronaldbradford/schema) reference.
-
-
 ## Speed
 
 There is almost no optimisation. Speed never was on the agenda, and if it were, I would have chosen the wrong language.
@@ -167,7 +167,7 @@ However, other schemas, ranging from simple to complex, which import and run sea
 
 Tested using MySQL 5.7 and 8.0
 
-This package is a beta. It's fit for my purpose (I have run it on interesting proprietary schemas (e.g. with single-bit columns), as well as the example databases). But it cannot hope to support all MySQL schemas.
+This package is a beta. It's fit for my purpose (I have run it on interesting proprietary schemas (e.g. with single-bit columns), as well as the example databases). But it cannot hope to support all variations (good and bad) of MySQL schemas.
 
 
 ## License
