@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.21
+        * @version         0.22
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -108,6 +108,13 @@ final class Filler
                 TABLE_TYPE = "BASE TABLE"';
 
         $rR = $this->db->conn->query($sTableQ);
+
+        if ($rR->num_rows === 0)
+        {
+            $this->aMessages[] = "The '" . $this->db->dbname . "' database appears to contain no tables!";
+            return;
+        }
+
         $aT = $rR->fetch_all();
 
         $aTables = array_merge(...$aT);
