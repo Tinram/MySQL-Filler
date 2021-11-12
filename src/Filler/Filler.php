@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.23
+        * @version         0.24
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -195,8 +195,6 @@ final class Filler
     */
     private function processTables(array $aTables): void
     {
-        $aEnumFields = [];
-
         for ($i = 1; $i <= $this->iNumRows; $i++)
         {
             foreach ($aTables as $sTable)
@@ -237,7 +235,7 @@ final class Filler
                 while ($aRow = $rResult->fetch_assoc())
                 {
                     $iMaxLen = 0;
-
+                    $aEnumFields = [];
                     $sSign = (strpos($aRow['COLUMN_TYPE'], 'unsigned') !== false) ? '+' : '';
 
                     switch ($aRow['DATA_TYPE'])
@@ -352,7 +350,8 @@ final class Filler
                         'precision' => (int) $aRow['NUMERIC_SCALE'],
                         'sign' => $sSign,
                         'key' => $aRow['COLUMN_KEY'],
-                        'extra' => $aRow['EXTRA']
+                        'extra' => $aRow['EXTRA'],
+                        'enum_vals' => $aEnumFields
                     ];
                 }
 
@@ -508,8 +507,8 @@ final class Filler
                     }
                     else if ($v['data_type'] === 'enum' || $v['data_type'] === 'set')
                     {
-                        $k = array_rand($aEnumFields, 1);
-                        $aDBCols[$sColumnName] = $aEnumFields[$k];
+                        $k = array_rand($v['enum_vals'], 1);
+                        $aDBCols[$sColumnName] = $v['enum_vals'][$k];
                     }
                     else if (strpos($v['data_type'], 'blob') !== false)
                     {
