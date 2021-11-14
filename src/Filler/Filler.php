@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.24
+        * @version         0.25
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -368,9 +368,17 @@ final class Filler
 
                 foreach ($aColAttributes as $sColumnName => $v)
                 {
-                    if ($v['extra'] === 'auto_increment' && count($aColAttributes) !== 1) # skip autoincrementing integer primary key column
+                    if ($v['key'] === 'PRI')
                     {
-                        continue;
+                        if ($v['extra'] === 'auto_increment' && count($aColAttributes) !== 1) # skip auto-incrementing PK column
+                        {
+                            continue;
+                        }
+
+                        if ($v['extra'] === 'DEFAULT_GENERATED')
+                        {
+                            continue;
+                        }
                     }
 
                     $sType = 's'; # default parameter type
