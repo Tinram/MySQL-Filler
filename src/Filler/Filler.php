@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.27
+        * @version         0.28
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -298,10 +298,13 @@ final class Filler
                             $iMaxLen = 4;
                         break;
 
-                        case 'float':
                         case 'decimal':
-                        case 'double':
                             $iMaxLen = (int) ($aRow['NUMERIC_PRECISION']);
+                        break;
+
+                        case 'float':
+                        case 'double':
+                            $iMaxLen = ((int) $aRow['NUMERIC_PRECISION'] - (int) $aRow['NUMERIC_SCALE']);
                         break;
 
                         case 'enum':
@@ -402,7 +405,7 @@ final class Filler
                             $aDBCols[$sColumnName] = CharGenerator::generateText($v['max_length'], 'alpha');
                         }
                     }
-                    else if (strpos($sColumnName, 'email') !== false && strpos($v['data_type'], 'int') === false)
+                    else if (strpos($sColumnName, 'email') !== false && strpos($v['data_type'], 'char') !== false)
                     {
                         $aDBCols[$sColumnName] = CharGenerator::generateEmail(10, 'gibberish');
                     }
@@ -490,7 +493,15 @@ final class Filler
                     else if ($v['data_type'] === 'float' || $v['data_type'] === 'double')
                     {
                         $sType = 'd';
-                        $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * (1000 - 1)), 2);
+
+                        if ($v['max_length'] < 6)
+                        {
+                            $aDBCols[$sColumnName] = round(lcg_value() * $v['max_length'], $v['precision']);
+                        }
+                        else
+                        {
+                            $aDBCols[$sColumnName] = round(lcg_value() * ($v['max_length'] * (1000 - 1)), $v['precision']);
+                        }
                     }
                     else if ($v['data_type'] === 'date')
                     {
