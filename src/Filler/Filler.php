@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.26
+        * @version         0.27
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -222,7 +222,7 @@ final class Filler
 
                 $sColAtts = '
                     SELECT
-                        EXTRA, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COLUMN_TYPE, COLUMN_KEY
+                        COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COLUMN_TYPE, COLUMN_KEY, EXTRA
                     FROM
                         information_schema.COLUMNS
                     WHERE
@@ -686,7 +686,7 @@ final class Filler
                 kcu.REFERENCED_COLUMN_NAME "ref_table_key",
                 UNIQUE_CONSTRAINT_NAME "key_type"
             FROM
-                information_schema.KEY_COLUMN_USAGE AS kcu
+                KEY_COLUMN_USAGE AS kcu
             INNER JOIN
                 REFERENTIAL_CONSTRAINTS ON REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME
             WHERE
@@ -719,6 +719,8 @@ final class Filler
         {
             foreach ($aKey as $k)
             {
+                $aK = [];
+
                 $sQ = '
                     SELECT `' . $k['ref_table_key'] . '`
                     FROM `' . $k['ref_table'] . '`
@@ -731,11 +733,15 @@ final class Filler
                 }
 
                 $rR = $this->db->conn->query($sQ);
-                $aK = $rR->fetch_all();
+
+                if ($rR !== false)
+                {
+                    $aK = $rR->fetch_all();
+                }
 
                 if (count($aK) === 0)
                 {
-                    $this->aMessages[] = 'ERROR in ' . __METHOD__ . ' for table: ' . $sTable;
+                    $this->aMessages[] = __METHOD__ . ' failed for table: ' . $sTable;
                     continue;
                 }
                 else
