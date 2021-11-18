@@ -11,7 +11,7 @@ Fill all the tables of a MySQL database with a limited number of rows, and jumbl
 
 ## Background
 
-Some work requires populating empty database schemas with junk data. Real data would be too copious and/or *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) filled the database tables but a few foreign keys needed to be added afterwards for joins &ndash; annoying.
+Some work requires populating empty database schemas with junk data. Real data would be too copious, bandwidth-stealing, or *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) fills database tables but a few foreign keys needed to be added afterwards for joins &ndash; annoying.
 
 
 ## Example Databases
@@ -19,6 +19,7 @@ Some work requires populating empty database schemas with junk data. Real data w
 database | support | notes |
 :- | :-: | :- |
 [*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) | :heavy_check_mark: | substantial intersection table |
+[*classicmodels*](https://www.mysqltutorial.org/wp-content/uploads/2018/03/mysqlsampledatabase.zip) | :heavy_check_mark: | |
 [employees](https://github.com/ronaldbradford/schema/blob/master/employees.sql) <small>(old)</small> | :heavy_check_mark: | |
 [Joomla](https://github.com/ronaldbradford/schema/blob/master/joomla.sql) <small>(old)</small> | :heavy_check_mark: | |
 [*Sakila*](https://dev.mysql.com/doc/index-other.html) | :heavy_multiplication_x: | |
