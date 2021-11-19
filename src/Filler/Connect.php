@@ -15,7 +15,7 @@ final class Connect
         * @author          Martin Latter
         * @author          Aaron Saray (getInstance())
         * @copyright       Martin Latter 2016
-        * @version         0.04
+        * @version         0.05
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -46,11 +46,11 @@ final class Connect
             die($sMessage);
         }
 
-        $this->conn = new mysqli($aConfig['host'], $aConfig['username'], $aConfig['password'], $aConfig['database']);
+        $this->conn = @new mysqli($aConfig['host'], $aConfig['username'], $aConfig['password'], $aConfig['database']);
 
         if ($this->conn->connect_errno > 0)
         {
-            $sMessage = 'Connection failed: ' . $this->conn->connect_error . ' (' . $this->conn->connect_errno . ')';
+            $sMessage = 'Connection failed: ' . $this->conn->connect_error . ' (' . $this->conn->connect_errno . ')' . PHP_EOL;
             die($sMessage);
         }
         else
