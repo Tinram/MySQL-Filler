@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.28
+        * @version         0.29
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -413,7 +413,7 @@ final class Filler
                     {
                         $aDBCols[$sColumnName] = CharGenerator::generateNumber(14);
                     }
-                    else if ((strpos($sColumnName, 'update') === false) && (strpos($sColumnName, 'date') !== false))
+                    else if (strpos($sColumnName, 'date') !== false && $v['data_type'] === 'date')
                     {
                         $aDBCols[$sColumnName] = CharGenerator::generateDate(5, 'date', 'day');
                     }
