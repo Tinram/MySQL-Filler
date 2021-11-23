@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.29
+        * @version         0.30
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -155,7 +155,14 @@ final class Filler
             $rE = $this->db->conn->query($sQ);
         }
 
-        $this->aMessages[] ="Truncated all tables of '" . $this->db->dbname . "' database!";
+        if ($rE === true)
+        {
+            $this->aMessages[] ="Truncated all tables of '" . $this->db->dbname . "' database!";
+        }
+        else
+        {
+            $this->aMessages[] ="Truncation of '" . $this->db->dbname . "' database tables denied (check DROP GRANT for user).";
+        }
     }
 
     /**
@@ -779,6 +786,10 @@ final class Filler
                 if ($rR === true)
                 {
                     $this->aMessages[] = $k['fk_column'] . " key jumbled in table '" . $sTable . "'";
+                }
+                else
+                {
+                    $this->aMessages[] = "Key jumbling denied in table '" . $sTable . "' (check UPDATE GRANT for user).";
                 }
             }
         }
