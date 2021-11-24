@@ -78,7 +78,7 @@ mysql> GRANT SELECT, INSERT, UPDATE, DROP ON world.* TO 'general'@'localhost' ID
 mysql> FLUSH PRIVILEGES;
 ```
 
-Wipe all data that *world* ships with:
+Wipe all data that *world* ships with using `truncate` set to `true`:
 
 ```php
 $config = [
@@ -94,7 +94,11 @@ php runner.php
 
     Truncated all tables of 'world' database!
 
-Change `truncate` to true, execute *runner.php* again:
+Change `truncate` to `false` and execute *runner.php* again:
+
+```bash
+php runner.php
+```
 
     Tables of 'world' populated with 20 rows.
 
@@ -154,14 +158,14 @@ There is almost no optimisation. Speed never was on the agenda, and if it were, 
 
 I load 100 to 1,000 database rows and the key jumble facilitates SQL joins in the junk data.
 
-For serious speed, there's Percona's Go-based [mysql_random_data_load](https://github.com/Percona-Lab/mysql_random_data_load). Currently, this tool fills one table at a time &ndash; fast &ndash; yet somewhat laboriously for databases with lots of tables, whereas I wanted all database tables populated with one command.
+For serious speed, there's Percona's Go-based [mysql_random_data_load](https://github.com/Percona-Lab/mysql_random_data_load). Currently, this tool fills one table at a time &ndash; fast &ndash; yet somewhat laborious for databases with lots of tables, whereas I wanted all database tables populated with one command.
 
 
 ## MariaDB
 
 MariaDB has limited support.  
 Simple schemas such as [*world*](https://dev.mysql.com/doc/index-other.html) and [*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) work fine in MariaDB.  
-However, other schemas, ranging from simple to complex, which import and run seamlessly in MySQL versions 5.7 and 8.0, can really throw MariaDB.
+However, other schemas, ranging from simple to complex, which import and run seamlessly in MySQL versions 5.7 and 8.0, can really choke MariaDB.
 
 
 ## Other
