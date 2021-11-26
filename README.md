@@ -11,7 +11,7 @@ Fill all the tables of a MySQL database with a limited number of rows, and jumbl
 
 ## Background
 
-Some tasks require populating databases for testing. Real data is often massive, and usually *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) fills database tables &ndash; useful for schema design but not queries.
+Some tasks require populating databases for testing. Database dumps are huge and the data usually *verboten* without anonymisation (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) fills database tables &ndash; useful for schema design but not queries.
 
 
 ## Example Databases
@@ -175,7 +175,7 @@ However, other schemas, ranging from simple to complex, which import and run sea
 
 Tested using MySQL 5.7 and 8.0
 
-This package is beta. It's fit for my purposes of populating work schemas. But it cannot hope to support all variations (good and bad) of MySQL schemas.
+This package is beta. It's fit for my purpose of populating work database schemas. But it cannot hope to support all variations (good and bad) of MySQL schemas.
 
 
 ## License
