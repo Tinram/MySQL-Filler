@@ -11,7 +11,7 @@ Fill all the tables of a MySQL database with a limited number of rows, and jumbl
 
 ## Background
 
-Some work requires populating empty database schemas with junk data. Real data would be too copious, bandwidth-stealing, or *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) fills database tables but a few foreign keys needed to be added afterwards for joins &ndash; annoying.
+Some tasks require populating databases for testing. Real data is often massive, and usually *verboten* (i.e. contains Personally Identifiable Information). My [old script](https://github.com/Tinram/Database-Filler) fills database tables &ndash; useful for schema design but not queries.
 
 
 ## Example Databases
@@ -21,7 +21,7 @@ database | support | notes |
 [*basketball*](https://github.com/Tinram/Database-Filler/blob/master/basketball.sql) | :heavy_check_mark: | substantial intersection table |
 [*classicmodels*](https://www.mysqltutorial.org/wp-content/uploads/2018/03/mysqlsampledatabase.zip) | :heavy_check_mark: | |
 [employees](https://github.com/ronaldbradford/schema/blob/master/employees.sql) <small>(old)</small> | :heavy_check_mark: | |
-[Joomla](https://github.com/ronaldbradford/schema/blob/master/joomla.sql) <small>(old)</small> | :heavy_check_mark: | |
+[Joomla](https://github.com/ronaldbradford/schema/blob/master/joomla.sql) <small>(old)</small> | :heavy_check_mark: | 60 tables |
 [*Sakila*](https://dev.mysql.com/doc/index-other.html) | :heavy_multiplication_x: | |
 [*world*](https://dev.mysql.com/doc/index-other.html) | :heavy_check_mark: | |
 [WordPress](https://github.com/ronaldbradford/schema/blob/master/wordpress.sql) <small>(old)</small> | :heavy_check_mark: | |
@@ -67,18 +67,21 @@ option | value | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description
 
 ## Example Run
 
-Using the simple MySQL [*world*](https://dev.mysql.com/doc/index-other.html) database:
+Using the simple MySQL [*world*](https://dev.mysql.com/doc/index-other.html) database,  
+import the database from the compressed file:
 
 ```bash
 $ tar -xzOf world-db.tar.gz | mysql -h localhost -u root -p
 ```
+
+Allocate a user with the required privileges:
 
 ```sql
 mysql> GRANT SELECT, INSERT, UPDATE, DROP ON world.* TO 'general'@'localhost' IDENTIFIED BY 'P@55w0rd';
 mysql> FLUSH PRIVILEGES;
 ```
 
-Wipe all data that *world* ships with using `truncate` set to `true`:
+Edit the *runner.php* file and wipe all data that the *world* database ships with by setting `truncate` to `true`:
 
 ```php
 $config = [
@@ -172,7 +175,7 @@ However, other schemas, ranging from simple to complex, which import and run sea
 
 Tested using MySQL 5.7 and 8.0
 
-This package is a beta. It's fit for my purpose (I have run it on interesting proprietary schemas (e.g. with single-bit columns), as well as the example databases). But it cannot hope to support all variations (good and bad) of MySQL schemas.
+This package is beta. It's fit for my purposes of populating work schemas. But it cannot hope to support all variations (good and bad) of MySQL schemas.
 
 
 ## License
