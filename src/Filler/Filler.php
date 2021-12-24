@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.30
+        * @version         0.31
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -202,175 +202,175 @@ final class Filler
     */
     private function processTables(array $aTables): void
     {
-        for ($i = 1; $i <= $this->iNumRows; $i++)
+        foreach ($aTables as $sTable)
         {
-            foreach ($aTables as $sTable)
+            if ($this->bDebug === true)
             {
-                if ($this->bDebug === true)
-                {
-                    echo 'processing table ' . $sTable . ' ...' . PHP_EOL;
-                }
+                echo 'processing table ' . $sTable . ' ...' . PHP_EOL;
+            }
 
-                if (count($this->aIgnoreTables) !== 0)
+            if (count($this->aIgnoreTables) !== 0)
+            {
+                if (in_array($sTable, $this->aIgnoreTables))
                 {
-                    if (in_array($sTable, $this->aIgnoreTables))
+                    if ($this->bDebug === true)
                     {
-                        if ($this->bDebug === true)
+                        echo '** ignoring table ' . $sTable . ' **' . PHP_EOL;
+                    }
+
+                    continue;
+                }
+            }
+
+            # get column attributes
+            $aColAttributes = [];
+
+            $sColAtts = '
+                SELECT
+                    COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COLUMN_TYPE, COLUMN_KEY, EXTRA
+                FROM
+                    information_schema.COLUMNS
+                WHERE
+                    TABLE_SCHEMA = "' . $this->db->dbname . '"
+                AND
+                    TABLE_NAME = "' . $sTable . '"';
+
+            $rResult = $this->db->conn->query($sColAtts);
+
+            while ($aRow = $rResult->fetch_assoc())
+            {
+                $iMaxLen = 0;
+                $aEnumFields = [];
+                $sSign = (strpos($aRow['COLUMN_TYPE'], 'unsigned') !== false) ? '+' : '';
+
+                switch ($aRow['DATA_TYPE'])
+                {
+                    case 'int':
+                        $iMaxLen = 9;
+                    break;
+
+                    case 'tinyint':
+                        $iMaxLen = 2;
+                    break;
+
+                    case 'smallint':
+                        $iMaxLen = 4;
+                    break;
+
+                    case 'mediumint':
+                        $iMaxLen = 6;
+                    break;
+
+                    case 'bigint':
+                        $iMaxLen = 19;
+                    break;
+
+                    case 'tinytext':
+                    case 'char':
+                        $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
+                    break;
+
+                    # limit large text datatype length
+                    case 'varchar':
+                        if (((int) $aRow['CHARACTER_MAXIMUM_LENGTH']) > 255)
                         {
-                            echo '** ignoring table ' . $sTable . ' **' . PHP_EOL;
-                        }
-
-                        continue;
-                    }
-                }
-
-                # get column attributes
-                $aColAttributes = [];
-
-                $sColAtts = '
-                    SELECT
-                        COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COLUMN_TYPE, COLUMN_KEY, EXTRA
-                    FROM
-                        information_schema.COLUMNS
-                    WHERE
-                        TABLE_SCHEMA = "' . $this->db->dbname . '"
-                    AND
-                        TABLE_NAME = "' . $sTable . '"';
-
-                $rResult = $this->db->conn->query($sColAtts);
-
-                while ($aRow = $rResult->fetch_assoc())
-                {
-                    $iMaxLen = 0;
-                    $aEnumFields = [];
-                    $sSign = (strpos($aRow['COLUMN_TYPE'], 'unsigned') !== false) ? '+' : '';
-
-                    switch ($aRow['DATA_TYPE'])
-                    {
-                        case 'int':
-                            $iMaxLen = 9;
-                        break;
-
-                        case 'tinyint':
-                            $iMaxLen = 2;
-                        break;
-
-                        case 'smallint':
-                            $iMaxLen = 4;
-                        break;
-
-                        case 'mediumint':
-                            $iMaxLen = 6;
-                        break;
-
-                        case 'bigint':
-                            $iMaxLen = 19;
-                        break;
-
-                        case 'tinytext':
-                        case 'char':
-                            $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
-                        break;
-
-                        # limit large text datatype length
-                        case 'varchar':
-                            if (((int) $aRow['CHARACTER_MAXIMUM_LENGTH']) > 255)
-                            {
-                                $iMaxLen = 255;
-                            }
-                            else
-                            {
-                                $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
-                            }
-                        break;
-
-                        case 'text':
-                        case 'mediumtext':
-                        case 'longtext':
                             $iMaxLen = 255;
-                        break;
-                        ##
+                        }
+                        else
+                        {
+                            $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
+                        }
+                    break;
 
-                        case 'date':
-                        case 'datetime':
-                        case 'timestamp':
-                            $iMaxLen = 0;
-                        break;
+                    case 'text':
+                    case 'mediumtext':
+                    case 'longtext':
+                        $iMaxLen = 255;
+                    break;
+                    ##
 
-                        case 'time':
-                            $iMaxLen = 10;
-                        break;
+                    case 'date':
+                    case 'datetime':
+                    case 'timestamp':
+                        $iMaxLen = 0;
+                    break;
 
-                        case 'year':
-                            $iMaxLen = 4;
-                        break;
+                    case 'time':
+                        $iMaxLen = 10;
+                    break;
 
-                        case 'decimal':
-                            $iMaxLen = (int) ($aRow['NUMERIC_PRECISION']);
-                        break;
+                    case 'year':
+                        $iMaxLen = 4;
+                    break;
 
-                        case 'float':
-                        case 'double':
-                            $iMaxLen = ((int) $aRow['NUMERIC_PRECISION'] - (int) $aRow['NUMERIC_SCALE']);
-                        break;
+                    case 'decimal':
+                        $iMaxLen = (int) ($aRow['NUMERIC_PRECISION']);
+                    break;
 
-                        case 'enum':
-                        case 'set':
-                            $rxEnum = preg_match_all("/'([\w\-\s]+)'/", $aRow['COLUMN_TYPE'], $aEnums);
-                            $aEnumFields = $aEnums[1];
-                        break;
+                    case 'float':
+                    case 'double':
+                        $iMaxLen = ((int) $aRow['NUMERIC_PRECISION'] - (int) $aRow['NUMERIC_SCALE']);
+                    break;
 
-                        case 'tinyblob':
-                        case 'blob':
-                        case 'mediumblob':
-                        case 'longblob':
+                    case 'enum':
+                    case 'set':
+                        $rxEnum = preg_match_all("/'([\w\-\s]+)'/", $aRow['COLUMN_TYPE'], $aEnums);
+                        $aEnumFields = $aEnums[1];
+                    break;
+
+                    case 'tinyblob':
+                    case 'blob':
+                    case 'mediumblob':
+                    case 'longblob':
+                        $iMaxLen = 39;
+                    break;
+
+                    case 'binary':
+                    case 'varbinary':
+                        if (((int) $aRow['CHARACTER_MAXIMUM_LENGTH']) < 39)
+                        {
+                            $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
+                        }
+                        else
+                        {
                             $iMaxLen = 39;
-                        break;
+                        }
+                    break;
 
-                        case 'binary':
-                        case 'varbinary':
-                            if (((int) $aRow['CHARACTER_MAXIMUM_LENGTH']) < 39)
-                            {
-                                $iMaxLen = ((int) $aRow['CHARACTER_MAXIMUM_LENGTH']);
-                            }
-                            else
-                            {
-                                $iMaxLen = 39;
-                            }
-                        break;
+                    case 'json':
+                        $iMaxLen = 0;
+                    break;
 
-                        case 'json':
-                            $iMaxLen = 0;
-                        break;
+                    case 'bit':
+                        $iMaxLen = 0;
+                    break;
 
-                        case 'bit':
-                            $iMaxLen = 0;
-                        break;
-
-                        default:
-                            $this->bErrors = true;
-                            $this->aMessages[] = '*** UNSUPPORTED DATATYPE *** : ' . $aRow['DATA_TYPE'];
-                            $iMaxLen = 0;
-                    }
-
-                    $aColAttributes[$aRow['COLUMN_NAME']] =
-                    [
-                        'data_type' => $aRow['DATA_TYPE'],
-                        'max_length' => $iMaxLen,
-                        'precision' => (int) $aRow['NUMERIC_SCALE'],
-                        'sign' => $sSign,
-                        'key' => $aRow['COLUMN_KEY'],
-                        'extra' => $aRow['EXTRA'],
-                        'enum_vals' => $aEnumFields
-                    ];
+                    default:
+                        $this->bErrors = true;
+                        $this->aMessages[] = '*** UNSUPPORTED DATATYPE *** : ' . $aRow['DATA_TYPE'];
+                        $iMaxLen = 0;
                 }
 
-                ############################################################
+                $aColAttributes[$aRow['COLUMN_NAME']] =
+                [
+                    'data_type' => $aRow['DATA_TYPE'],
+                    'max_length' => $iMaxLen,
+                    'precision' => (int) $aRow['NUMERIC_SCALE'],
+                    'sign' => $sSign,
+                    'key' => $aRow['COLUMN_KEY'],
+                    'extra' => $aRow['EXTRA'],
+                    'enum_vals' => $aEnumFields
+                ];
+            }
 
-                $lt = $this->db->conn->query('LOCK TABLES ' . $sTable . ' WRITE');
+            ############################################################
 
-                $this->db->conn->begin_transaction();
+            $lt = $this->db->conn->query('LOCK TABLES ' . $sTable . ' WRITE');
 
+            $this->db->conn->begin_transaction();
+
+            for ($i = 1; $i <= $this->iNumRows; $i++)
+            {
                 $aDBCols = [];
                 $aData = [];
                 $aPlaceholders = [];
@@ -619,17 +619,17 @@ final class Filler
 
                 $this->db->conn->commit();
 
-                $ut = $this->db->conn->query('UNLOCK TABLES');
-            }
-
-            # progress indicator
-            if ($this->iNumRows > $this->iCLIRowCounter)
-            {
-                if ($i % $this->iCLIRowCounter === 0)
+                # progress indicator
+                if ($this->iNumRows > $this->iCLIRowCounter)
                 {
-                    printf("%02d%%" . $this->sLineBreak . "\x1b[A", ($i / $this->iNumRows) * 100);
+                    if ($i % $this->iCLIRowCounter === 0)
+                    {
+                        printf("%02d%% %s                        " . $this->sLineBreak . "\x1b[A", ($i / $this->iNumRows) * 100, $sTable);
+                    }
                 }
             }
+
+            $ut = $this->db->conn->query('UNLOCK TABLES');
         }
 
         if ($this->bErrors === false)
