@@ -11,7 +11,7 @@ final class Filler
         *
         * @author          Martin Latter
         * @copyright       Martin Latter 22/10/2021
-        * @version         0.31
+        * @version         0.32
         * @license         GNU GPL version 3.0 (GPL v3); http://www.gnu.org/licenses/gpl.html
         * @link            https://github.com/Tinram/MySQL_Filler.git
         * @package         Filler
@@ -650,8 +650,6 @@ final class Filler
     */
     private function avoidDupes(string $sColumnName, string $sTable, int $iMaxLen, string $sStyleType): string
     {
-        dupe:
-
         $sChars = CharGenerator::generateText($iMaxLen, $sStyleType);
 
         $sUn = '
@@ -672,14 +670,17 @@ final class Filler
             {
                 $sT = $rR->fetch_row()[0];
 
-                if ($sChars === $sT)
+                while (1)
                 {
-                    goto dupe;
+                    $sChars = CharGenerator::generateText($iMaxLen, $sStyleType);
+
+                    if ($sChars !== $sT)
+                    {
+                        break;
+                    }
                 }
-                else
-                {
-                    return $sChars;
-                }
+
+                return $sChars;
             }
         }
         else
