@@ -41,6 +41,7 @@ tpcc | :heavy_multiplication_x: | partial with option fudges |
 ## Limitations
 
 + No support of MySQL spatial data types.
++ Capped length of longer data types.
 + Composite primary keys can be troublesome.
 
 
@@ -58,7 +59,7 @@ In *config.py*, edit the database credentials, and the *MySQL Filler* options re
 python3 main.py
 ```
 
-For multiprocessing support and a ~3x speed increase, copy the *config.py* file imports and global variables into *src/mysql_filler.py* and run as a standalone script.  
+For multiprocessing support (`PROCS = <num_cpu_cores>`) and a significant speed increase, copy the *config.py* file imports and global variables into *src/mysql_filler.py* and run as a standalone script.  
 It's un-pythonic and ugly, but runs multiprocessing more reliably.
 
 
