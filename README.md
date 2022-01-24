@@ -60,12 +60,33 @@ python3 main.py
 ```
 
 For multiprocessing support (`PROCS = <num_cpu_cores>`) and a significant speed increase, copy the *config.py* file imports and global variables into *src/mysql_filler.py* and run as a standalone script.  
-It's un-pythonic and ugly, but runs multiprocessing more reliably.
+It's un-pythonic and ugly, but executes multiprocessing more reliably.
 
 
 ## Options
 
-*TBC*
+```python
+
+NUM_ROWS = 10                     # number of rows to add per table
+PROCS = 1                         # number of multithreading processes
+
+JUMBLE_FKS = True                 # foreign key jumbling toggle
+FK_PCT_REPLACE = 25               # percentage (of row number added) of foreign keys to jumble
+
+STRICT_INSERT = False             # INSERT IGNORE toggle for innodb_strict_mode
+
+PROCESS_INT_FKS = True            # process integer foreign keys toggle (tpcc schema)
+COMPOSITE_PK_INCREMENT = False    # increment composite primary keys (tpcc schema)
+
+BYTES_DECODE = 'utf-8'            # character set for binary decoding
+MAX_PACKET = False                # toggle extend maximum packet size (root user only)
+
+DEBUG = False                     # debug output toggle
+EXTENDED_DEBUG = False            # verbose debug output toggle
+
+TRUNCATE_TABLES = False           # truncate all database tables (instead of populating) toggle
+
+```
 
 
 ## Example Run
