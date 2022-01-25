@@ -1,12 +1,12 @@
 
 # MySQL Filler
 
-#### Populate a MySQL database and optionally create fake foreign keys between tables.
+#### Fill all MySQL database tables.
 
 
 ## Purpose
 
-Fill all the tables of a MySQL database with a limited number of rows, and optionally jumble the foreign keys to create sufficient fake key relationships between tables for SQL joins.
+Populate all the tables of a MySQL database with a specified number of rows of junk data, and optionally jumble the foreign keys to create sufficient fake key relationships between tables for SQL joins.
 
 
 ## Background
@@ -34,7 +34,7 @@ tpcc | :heavy_multiplication_x: | partial with option fudges |
 
 ## Requirements
 
-+ An empty/truncated or throwaway database already present in the MySQL server.
++ An empty or truncated or throwaway database schema already present in the MySQL server.
 + Sufficient privileges granted for the connecting user.
 
 
@@ -73,18 +73,18 @@ PROCS = 1                         # number of multithreading processes
 JUMBLE_FKS = True                 # foreign key jumbling toggle
 FK_PCT_REPLACE = 25               # percentage (of row number added) of foreign keys to jumble
 
-STRICT_INSERT = False             # INSERT IGNORE toggle for innodb_strict_mode
+STRICT_INSERT = False             # INSERT IGNORE toggle to bypass strict SQL mode (warnings rather than errors)
 
-PROCESS_INT_FKS = True            # process integer foreign keys toggle (tpcc schema)
-COMPOSITE_PK_INCREMENT = False    # increment composite primary keys (tpcc schema)
+PROCESS_INT_FKS = True            # process or skip integer foreign keys toggle (tpcc schema)
+COMPOSITE_PK_INCREMENT = False    # skip or increment composite primary keys toggle (tpcc schema)
 
 BYTES_DECODE = 'utf-8'            # character set for binary decoding
-MAX_PACKET = False                # toggle extend maximum packet size (root user only)
+MAX_PACKET = False                # increased maximum packet size toggle (root user only)
 
 DEBUG = False                     # debug output toggle
 EXTENDED_DEBUG = False            # verbose debug output toggle
 
-TRUNCATE_TABLES = False           # truncate all database tables (instead of populating) toggle
+TRUNCATE_TABLES = False           # truncate all database tables toggle (instead of populating)
 
 ```
 
