@@ -29,7 +29,7 @@ class MySQLFiller():
 
         Author         Martin Latter
         Copyright      Martin Latter 16/12/2021
-        Version        0.27
+        Version        0.28
         License        GPL version 3.0 (GPL v3); https://www.gnu.org/licenses/gpl.html
         Link           https://github.com/Tinram/MySQL-Filler.git
     """
@@ -159,6 +159,10 @@ class MySQLFiller():
                     continue
                 if tab_dat['EXTRA'] == 'DEFAULT_GENERATED':
                     continue
+
+            # skip spatial types
+            if data_type in ['geometry', 'point', 'linestring', 'polygon', 'multipoint', 'multilinestring', 'multipolygon', 'geometrycollection']:
+                continue
 
             cols.append(tab_dat['COLUMN_NAME'])
             placeholder.append('%s')
