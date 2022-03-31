@@ -22,6 +22,7 @@ database | support | notes |
 [*classicmodels*](https://www.mysqltutorial.org/wp-content/uploads/2018/03/mysqlsampledatabase.zip) | :heavy_check_mark: | |
 [employees](https://github.com/ronaldbradford/schema/blob/master/employees.sql) <small>(old)</small> | :heavy_check_mark: | |
 [Joomla](https://github.com/ronaldbradford/schema/blob/master/joomla.sql) <small>(old)</small> | :heavy_check_mark: | 60 tables |
+[Northwind](https://docs.yugabyte.com/latest/sample-data/northwind/) | :heavy_check_mark: | |
 [*Sakila*](https://dev.mysql.com/doc/index-other.html) | :heavy_multiplication_x: | |
 tpcc | :heavy_multiplication_x: | partial with option fudges |
 [*world*](https://dev.mysql.com/doc/index-other.html) | :heavy_check_mark: | |
