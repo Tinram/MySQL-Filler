@@ -29,7 +29,7 @@ class MySQLFiller():
 
         Author         Martin Latter
         Copyright      Martin Latter 16/12/2021
-        Version        0.28
+        Version        0.29
         License        GPL version 3.0 (GPL v3); https://www.gnu.org/licenses/gpl.html
         Link           https://github.com/Tinram/MySQL-Filler.git
     """
@@ -66,7 +66,7 @@ class MySQLFiller():
                 TABLE_TYPE = 'BASE TABLE'
             """ % (DB_CONFIG['db'])
 
-        with conn.cursor() as cursor:
+        with CONN.cursor() as cursor:
             cursor.execute(tables_query)
             results = cursor.fetchall()
 
@@ -81,7 +81,7 @@ class MySQLFiller():
         if TRUNCATE_TABLES:
 
             print('Truncating all tables of `' + DB_CONFIG['db'] + '` database ...')
-            with conn.cursor() as cursor:
+            with CONN.cursor() as cursor:
                 for table in tables:
                     try:
                         trc = cursor.execute('TRUNCATE TABLE `' + table + '`')
@@ -108,6 +108,8 @@ class MySQLFiller():
 
         print('\n' + format((time.time() - start), ".3f") + 's')
 
+        if CONN is not None:
+            CONN.close()
 
 
     def worker(self, table):
@@ -134,7 +136,7 @@ class MySQLFiller():
                 TABLE_NAME = '%s'
             """ % (DB_CONFIG['db'], table)
 
-        with conn.cursor() as cursor:
+        with CONN.cursor() as cursor:
             cursor.execute(column_query)
             column_results = cursor.fetchall()
 
@@ -197,7 +199,7 @@ class MySQLFiller():
                             self.foreign_keys[tab_dat['COLUMN_NAME']]['column']
                         )
 
-                    with conn.cursor() as cursor:
+                    with CONN.cursor() as cursor:
                         cursor.execute(last_fk_value)
                         fk_result = cursor.fetchall()
 
@@ -320,7 +322,7 @@ class MySQLFiller():
 
         if table_name != '':
 
-            with conn.cursor() as cursor:
+            with CONN.cursor() as cursor:
 
                 values = []
                 i_val = 0
@@ -402,11 +404,11 @@ class MySQLFiller():
 
                 try:
                     cursor.executemany(insert, values)
-                    conn.commit()
+                    CONN.commit()
                     print('`' + table + '`')
 
                 except MySQLdb.Error as err:
-                    conn.rollback()
+                    CONN.rollback()
                     if STRICT_INSERT:
                         print('** `' + table + '` not populated')
                         print(err)
@@ -501,7 +503,7 @@ class MySQLFiller():
                 new_key
             )
 
-        with conn.cursor() as cursor:
+        with CONN.cursor() as cursor:
             cursor.execute(sql_keys)
             key_lookup = cursor.fetchall()
 
@@ -530,7 +532,7 @@ class MySQLFiller():
                 REFERENCED_TABLE_SCHEMA = '%s'
             """ % (DB_CONFIG['db'])
 
-        with conn.cursor() as cursor:
+        with CONN.cursor() as cursor:
             cursor.execute(fk_query)
             fks_results = cursor.fetchall()
 
@@ -561,7 +563,7 @@ class MySQLFiller():
                 REFERENCED_TABLE_SCHEMA = '%s'
             """ % (DB_CONFIG['db'])
 
-        with conn.cursor() as cursor:
+        with CONN.cursor() as cursor:
             cursor.execute(fk_query)
             key_results = cursor.fetchall()
 
@@ -585,7 +587,7 @@ class MySQLFiller():
                 CONSTRAINT_TYPE = 'UNIQUE'
             """ % (DB_CONFIG['db'])
 
-        with conn.cursor() as cursor:
+        with CONN.cursor() as cursor:
             cursor.execute(uk_query)
             unique_results = cursor.fetchall()
 
@@ -615,7 +617,7 @@ class MySQLFiller():
             if EXTENDED_DEBUG:
                 print(key_query)
 
-            with conn.cursor() as cursor:
+            with CONN.cursor() as cursor:
                 cursor.execute(key_query)
                 results = cursor.fetchall()
 
@@ -623,7 +625,7 @@ class MySQLFiller():
                 print('\njumble_foreign_keys() failed for table: `' + table_name + '`')
                 continue
 
-            with conn.cursor() as cursor:
+            with CONN.cursor() as cursor:
 
                 for col_val in results:
 
@@ -662,18 +664,18 @@ class MySQLFiller():
 
 # Ugly database connect – for spawned processes requiring shared global object.
 try:
-    conn = MySQLdb.connect(**DB_CONFIG)
+    CONN = None
+    CONN = MySQLdb.connect(**DB_CONFIG)
+    with CONN.cursor() as cursor:
+        cursor.execute('SET SESSION foreign_key_checks = OFF')
+        cursor.execute('SET SESSION unique_checks = OFF')
+        # cursor.execute('SET sql_mode=(SELECT CONCAT(@@session.sql_mode, ",ALLOW_INVALID_DATES"))')
+        if DB_CONFIG['user'] == 'root' and MAX_PACKET:
+            cursor.execute('SET GLOBAL max_allowed_packet = 268435456')
 except MySQLdb.Error as err:
     print('Failed to connect to database: (%d) %s' % (err.args[0], err.args[1]))
     print('Check database name and database access privileges.')
     sys.exit(1)
-
-with conn.cursor() as cursor:
-    cursor.execute('SET SESSION foreign_key_checks = OFF')
-    cursor.execute('SET SESSION unique_checks = OFF')
-    # cursor.execute('SET sql_mode=(SELECT CONCAT(@@session.sql_mode, ",ALLOW_INVALID_DATES"))')
-    if DB_CONFIG['user'] == 'root' and MAX_PACKET:
-        cursor.execute('SET GLOBAL max_allowed_packet = 268435456')
 
 
 def main():
