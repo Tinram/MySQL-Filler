@@ -35,7 +35,7 @@ tpcc | :heavy_multiplication_x: | partial with option fudges |
 
 ## Requirements
 
-+ An empty or truncated or throwaway database schema already present in the MySQL server.
++ An *empty* or *truncated* or *throwaway* database schema already present in the MySQL server.
 + Sufficient privileges granted for the connecting user.
 
 
@@ -68,24 +68,26 @@ It's un-pythonic and ugly, but executes multiprocessing more reliably.
 
 ```python
 
-NUM_ROWS = 10                     # number of rows to add per table
-PROCS = 1                         # number of multithreading processes
+NUM_ROWS = 10                     # number of rows to add to all database tables
+PROCS = 1                         # number of processes to spawn
 
-JUMBLE_FKS = True                 # foreign key jumbling toggle
-FK_PCT_REPLACE = 25               # percentage (of row number added) of foreign keys to jumble
+JUMBLE_FKS = True                 # toggle random jumbling of foreign keys for joins
+FK_PCT_REPLACE = 25               # percentage of NUM_ROWS of foreign keys to jumble
 
-STRICT_INSERT = False             # INSERT IGNORE toggle to bypass strict SQL mode (warnings rather than errors)
+STRICT_INSERT = False             # toggle INSERT IGNOREs for duplicate hits / bypass strict SQL mode (warnings versus errors)
 
-PROCESS_INT_FKS = True            # process or skip integer foreign keys toggle (tpcc schema)
-COMPOSITE_PK_INCREMENT = False    # skip or increment composite primary keys toggle (tpcc schema)
+PROCESS_INT_FKS = True            # process (True) or skip (False) integer foreign keys (TPCC schema with tinyint PKs)
+COMPOSITE_PK_INCREMENT = False    # skip (False) or increment (True) composite primary keys (TPCC schema)
 
-BYTES_DECODE = 'utf-8'            # character set for binary decoding
-MAX_PACKET = False                # increased maximum packet size toggle (root user only)
+COMPLEX_JSON = False              # False for simple fixed JSON data; True to generate variable JSON data
+
+BYTES_DECODE = 'utf-8'            # character set used for byte data type conversion
+MAX_PACKET = False                # True maximises the packet size (root user only)
 
 DEBUG = False                     # debug output toggle
 EXTENDED_DEBUG = False            # verbose debug output toggle
 
-TRUNCATE_TABLES = False           # truncate all database tables toggle (instead of populating)
+TRUNCATE_TABLES = False           # toggle truncation of all database tables (instead of populating)
 
 ```
 
