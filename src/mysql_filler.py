@@ -29,7 +29,7 @@ class MySQLFiller():
 
         Author         Martin Latter
         Copyright      Martin Latter 16/12/2021
-        Version        0.30
+        Version        0.31
         License        GPL version 3.0 (GPL v3); https://www.gnu.org/licenses/gpl.html
         Link           https://github.com/Tinram/MySQL-Filler.git
     """
@@ -525,12 +525,9 @@ class MySQLFiller():
         return new_key
 
 
-    def gen_zip_json(self, start, end, num):
-        """ Generate pseudo zips for JSON string. """
-        L = []
-        for _ in range(num):
-            L.append(random.randint(start, end))
-        return str(L)
+    def gen_city_json(self, length):
+        """ Generate gibberish city names for JSON string. """
+        return ''.join(random.choice(string.ascii_lowercase) for _ in range(length)).title()
 
 
     def gen_state_json(self, length):
@@ -538,9 +535,12 @@ class MySQLFiller():
         return ''.join(random.choice(string.ascii_uppercase) for _ in range(length))
 
 
-    def gen_city_json(self, length):
-        """ Generate gibberish city names for JSON string. """
-        return ''.join(random.choice(string.ascii_lowercase) for _ in range(length)).title()
+    def gen_zip_json(self, start, end, num):
+        """ Generate pseudo zips for JSON string. """
+        zips = []
+        for _ in range(num):
+            zips.append(random.randint(start, end))
+        return zips
 
 
     def get_foreign_keys(self):
